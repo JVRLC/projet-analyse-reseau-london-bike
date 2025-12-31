@@ -1,187 +1,77 @@
-# Analyse d’un réseau – London Bike Sharing
+# London Bike Sharing Network Analysis
 
-## 1. Contexte du projet
+Analyse statistique et machine learning d'un réseau de 777 stations de vélos en libre-service à Londres
 
-Ce projet vise à analyser un **réseau de stations de vélos en libre-service à Londres** à partir des données de trajets entre stations. Le problème est formulé comme une **analyse de réseau** combinant :
+## Table des matières
 
-* construction d’une matrice de connectivité,
-* réduction de dimension,
-* clustering (k-means, GMM),
-* modélisation probabiliste latente.
+- [À propos](#à-propos)
+- [Contexte du projet](#contexte-du-projet)
+- [Méthodologie](#méthodologie)
+- [Structure du projet](#structure-du-projet)
+- [Technologies](#technologies)
+- [Résultats](#résultats)
 
-Le projet met en œuvre des outils de **statistique**, **machine learning** et **théorie des graphes**, principalement en Python.
+## À propos
 
----
+Ce projet analyse le réseau de stations de vélos en libre-service de Londres en combinant théorie des graphes, statistique et machine learning. L'objectif est de découvrir la structure latente du réseau et d'identifier des groupes de stations ayant des comportements similaires.
 
-## 2. Données
+### Caractéristiques principales
 
-### 2.1 Description
+- 777 stations géolocalisées à Londres
+- Analyse de réseau via matrice de connectivité
+- Réduction de dimension avec ACP probabiliste
+- Clustering via K-means et GMM
+- Modélisation probabiliste avec variables latentes
 
-* **Nombre d’individus (stations)** : ( N = 777 )
-* **Station** : position géographique des stations (latitude, longitude)
-* **Journey** : trajets de vélos d’une station ( i ) vers une station ( j )
+## Contexte du projet
 
-On définit :
+Le système de vélos partagés de Londres génère des milliers de trajets quotidiens. Ce projet vise à :
 
-[
-A_{ij} = \text{nombre de trajets de la station } i \text{ vers la station } j
-]
-
-La matrice de connectivité est donc :
-
-[
-A \in \mathbb{N}^{777 \times 777}
-]
+1. Modéliser les interactions entre stations via une matrice de connectivité de dimension $777 \times 777$
+2. Découvrir une représentation latente $\mathbf{Z}$ pour chaque station dans $\mathbb{R}^d$
+3. Identifier des clusters de stations ayant des profils d'utilisation similaires
+4. Interpréter géographiquement les résultats obtenus
 
 ### Hypothèses
 
-* ( A ) est **symétrique**
-* diagonale nulle : ( A_{ii} = 0 )
+- La matrice $\mathbf{A}$ est symétrique : $A_{ij} = A_{ji}$
+- Pas d'auto-boucles : $A_{ii} = 0$
+- Les interactions dépendent de la distance latente entre stations
 
----
+## Méthodologie
 
-## 3. Modélisation du réseau
+### 1. Construction de la matrice de connectivité
 
-### 3.1 Matrice binaire d’adjacence
+$A_{ij}$ représente le nombre de trajets de la station $i$ vers la station $j$
 
-On introduit une matrice binaire :
+### 2. Matrice binaire d'adjacence
 
-[
-A^{binaire}_{ij} \in {0,1}
-]
+$$A_{ij}^{\text{binaire}} = \begin{cases} 1 & \text{si } A_{ij} > 0 \\ 0 & \text{sinon} \end{cases}$$
 
-avec :
+### 3. Réduction de dimension
 
-[
-A^{binaire}*{ij} = 1 \iff A*{ij} > 0
-]
+- ACP probabiliste (PPCA) pour extraire les variables latentes $\mathbf{Z}_i \in \mathbb{R}^d$
+- Projection dans un espace latent de faible dimension
 
-Elle représente l’existence d’une interaction entre deux stations.
+### 4. Clustering
 
----
+**K-means** : regroupement des stations dans l'espace latent, initialisation du GMM
 
-## 4. Représentation latente
+**Gaussian Mixture Model** : modèle de mélange gaussien avec $K$ composantes, estimation par algorithme EM
 
-Chaque station ( i ) est associée à une représentation latente :
+### 5. Modélisation probabiliste
 
-[
-Z_i \in \mathbb{R}^2
-]
+Lien entre distance latente et probabilité d'interaction :
 
-La distance latente entre deux stations est :
+$$d_{ij} = \|\mathbf{Z}_i - \mathbf{Z}_j\|_2$$
 
-[
-d_{ij} = | Z_i - Z_j |_2
-]
+$$P(A_{ij} = 1 | \mathbf{Z}_i, \mathbf{Z}_j) = \sigma(-\alpha \cdot d_{ij} + \beta)$$
 
-On modélise ensuite les interactions par :
+où $\sigma$ est la fonction sigmoïde.
 
-[
-A_{ij} \sim \mathcal{B}(p = f(d_{ij}))
-]
-
-avec :
-
-* ( f ) une fonction **décroissante** de la distance (ex : fonction logistique ou exponentielle)
-
----
-
-## 5. Phase intermédiaire (agrégation)
-
-Afin de simplifier le problème, on construit une matrice agrégée :
-
-[
-A \in \mathbb{N}^{777 \times 17}
-]
-
-* 17 variables résumant l’activité des stations
-* Modélisation via une **loi de Poisson**
-
-[
-A_{ik} \sim \mathcal{P}(\lambda_{ik})
-]
-
----
-
-## 6. Réduction de dimension
-
-### 6.1 ACP probabiliste (PPCA)
-
-Objectif : associer à chaque station une variable latente
-
-[
-Z_i \in \mathbb{R}^p, \quad p \ll 777
-]
-
-Méthodes possibles :
-
-* ACP probabiliste sur la matrice ( A )
-* ACP classique sur ( Z )
-* Utilisation du fichier fourni `mu_z.npy`
-
----
-
-## 7. Clustering
-
-### 7.1 K-means
-
-* Appliqué sur l’espace latent ( Z )
-* Sert également à **initialiser les paramètres du GMM**
-
-### 7.2 Gaussian Mixture Model (GMM)
-
-* Modèle probabiliste de clustering
-* Paramètres estimés par **EM (Expectation-Maximization)**
-* Initialisation : centres issus de k-means
-
----
-
-## 8. Modélisation probabiliste sur Z
-
-### 8.1 Vraisemblance
-
-Pour un GMM à ( K ) composantes :
-
-[
-p(Z_i) = \sum_{k=1}^K \pi_k , \mathcal{N}(Z_i ,|, \mu_k, \Sigma_k)
-]
-
-### 8.2 Inférence
-
-* Maximisation de la log-vraisemblance
-* Algorithme EM :
-
-  * **E-step** : calcul des responsabilités
-  * **M-step** : mise à jour des paramètres
-
----
-
-## 9. Analyse et interprétation
-
-* Interprétation des clusters de stations
-* Lien avec la géographie (zones centrales vs périphériques)
-* Comparaison k-means / GMM
-* Analyse de la structure du réseau
-
----
-
-## 10. Visualisation
-
-Outils utilisés :
-
-* **NetworkX** : graphe de connectivité
-* **Matplotlib / Seaborn** :
-
-  * graphe du réseau
-  * projection ACP
-  * clusters sur carte géographique
-
----
-
-## 11. Structure du dépôt Git
-
+## Structure du projet
 ```
-projet-analyse-reseau-london-bike/
+london-bike-network-analysis/
 │
 ├── data/
 │   ├── data.csv
@@ -201,34 +91,23 @@ projet-analyse-reseau-london-bike/
 │   ├── clustering.py
 │   └── visualization.py
 │
+├── results/
+│   ├── figures/
+│   └── models/
+│
 ├── requirements.txt
 ├── README.md
 └── rapport.pdf
 ```
 
----
+## Technologies
 
-## 12. Technologies
+- Python 3.8+
+- NumPy, Pandas
+- Scikit-learn
+- Matplotlib, Seaborn
+- NetworkX
 
-* Python 3
-* pandas, numpy
-* scikit-learn
-* networkx
-* matplotlib, seaborn
+## Résultats
 
----
-
-## 13. Objectifs pédagogiques
-
-* Comprendre la modélisation des réseaux
-* Lien entre graphes et variables latentes
-* Maîtriser ACP, k-means, GMM
-* Interpréter des résultats statistiques complexes
-
----
-
-## 14. Perspectives
-
-* Modèle de graphes latents (Latent Space Model)
-* Extension à des graphes dirigés
-* Prise en compte du temps (réseau dynamique)
+Les résultats détaillés sont disponibles dans le rapport final et les notebooks d'analyse.

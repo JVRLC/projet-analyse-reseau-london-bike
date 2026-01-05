@@ -1,10 +1,10 @@
 # 🚲 Analyse du Réseau de Vélos en Libre-Service de Londres
 
-## 📋 Description
+##  Description
 
 Ce projet analyse le réseau de vélos en libre-service (Santander Cycles) de Londres en utilisant des techniques avancées d'analyse de graphes et d'apprentissage automatique. L'objectif est de comprendre la structure du réseau, identifier des patterns de mobilité et modéliser les connexions entre stations.
 
-## 🎯 Objectifs
+##  Objectifs
 
 - **Explorer** les données de trajets et stations du réseau cyclable londonien
 - **Construire** et analyser la matrice de connectivité du réseau
@@ -13,7 +13,7 @@ Ce projet analyse le réseau de vélos en libre-service (Santander Cycles) de Lo
 - **Modéliser** la probabilité de connexion entre stations
 - **Analyser** les propriétés topologiques du réseau (centralité, densité, etc.)
 
-## 🛠️ Technologies Utilisées
+## Technologies Utilisées
 
 - **Python 3.x**
 - **NumPy** & **Pandas** - Manipulation des données
@@ -22,7 +22,7 @@ Ce projet analyse le réseau de vélos en libre-service (Santander Cycles) de Lo
 - **NetworkX** - Analyse de graphes
 - **SciPy** - Calculs scientifiques
 
-## 📁 Structure du Projet
+##  Structure du Projet
 
 ```
 projet-analyse-reseau-london-bike/
@@ -45,7 +45,7 @@ projet-analyse-reseau-london-bike/
 └── README.md
 ```
 
-## 📊 Résultats Clés
+##  Résultats Clés
 
 | Métrique | Valeur |
 |----------|--------|
@@ -55,7 +55,7 @@ projet-analyse-reseau-london-bike/
 | Nombre de clusters identifiés | 5 |
 | Score Silhouette | ~0.3 |
 
-## 🔬 Méthodologie
+##  Méthodologie
 
 1. **Exploration des données** : Analyse des distributions, visualisation géographique
 2. **Construction du graphe** : Matrice d'adjacence pondérée par le nombre de trajets
@@ -64,7 +64,7 @@ projet-analyse-reseau-london-bike/
 5. **Modélisation probabiliste** : Régression logistique pour prédire les connexions
 6. **Analyse de réseau** : Calcul des centralités (degré, betweenness, closeness)
 
-## 🚀 Installation
+##  Installation
 
 ```bash
 # Cloner le repository
@@ -78,7 +78,7 @@ pip install numpy pandas matplotlib seaborn scikit-learn networkx scipy
 jupyter notebook notebooks/analyse_complete.ipynb
 ```
 
-## 📈 Visualisations
+##  Visualisations
 
 Le projet génère plusieurs visualisations :
 - Carte géographique des stations avec capacité
@@ -88,10 +88,3 @@ Le projet génère plusieurs visualisations :
 - Graphe du réseau avec centralités
 - Modèle probabiliste de connexion
 
-## 👤 Auteur
-
-Serigne
-
-## 📄 Licence
-
-Ce projet est sous licence MIT.
